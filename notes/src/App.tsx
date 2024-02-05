@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
+import { BASE_URL } from './constants';
 
 class Note {
   id: number = -1;
@@ -25,7 +26,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/notes",
+        `${BASE_URL}/api/notes`,
         {
           method: "POST",
           headers: {
@@ -57,7 +58,7 @@ function App() {
     if (!selectedNote) return
 
     const response = await fetch(
-      `http://localhost:5000/api/notes/${selectedNote.id}`,
+      `${BASE_URL}/api/notes/${selectedNote.id}`,
       {
         method: "PUT",
         headers: {
@@ -68,7 +69,7 @@ function App() {
           content
         })
       }
-    ); 
+    );
 
     const updatedNote = await response.json()
 
@@ -91,16 +92,30 @@ function App() {
     setContent(note.content)
   };
 
-  const deleteNote = (event: React.MouseEvent, noteId: number) => {
+  const deleteNote = async (event: React.MouseEvent, noteId: number) => {
     event.stopPropagation()
 
-    const updatedNotes = notes.filter((note) => note.id !== noteId);
-    setNotes(updatedNotes)
+    try {
+      await fetch(
+        `${BASE_URL}/api/notes/${noteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const updatedNotes = notes.filter((note) => note.id !== noteId);
+      setNotes(updatedNotes)
+    } catch (err) {
+      console.log(err)
+    }
   };
 
   const fetchNotes = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/notes");
+      const response = await fetch(`${BASE_URL}/api/notes`);
       const jsonResponse = await response.json()
       const notes: Note[] = jsonResponse.result
       console.log(JSON.stringify(notes))

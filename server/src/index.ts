@@ -1,4 +1,4 @@
-import express from "express"
+import express, { Request, Response } from "express"
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
 
@@ -9,12 +9,12 @@ app.use(cors())
 
 const prisma = new PrismaClient()
 
-app.get("/api/notes", async (req, res) => {
+app.get("/api/notes", async (req: Request, res: Response) => {
     const notes = await prisma.note.findMany();
     res.json({ message: "success!", result: notes })
 })
 
-app.post("/api/notes", async (req, res) => {
+app.post("/api/notes", async (req: Request, res: Response) => {
     const { title, content } = req.body;
 
     if (!title || !title) {
@@ -31,7 +31,7 @@ app.post("/api/notes", async (req, res) => {
     }
 })
 
-app.put("/api/notes/:id", async (req, res) => {
+app.put("/api/notes/:id", async (req: Request, res: Response) => {
     const { title, content } = req.body;
     const id = parseInt(req.params.id);
 
@@ -50,7 +50,7 @@ app.put("/api/notes/:id", async (req, res) => {
     }
 })
 
-app.delete("/api/notes/:id", async (req, res) => {
+app.delete("/api/notes/:id", async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
 
     if (!id || isNaN(id)) {
@@ -67,6 +67,9 @@ app.delete("/api/notes/:id", async (req, res) => {
     }
 })
 
-app.listen(5000, () => {
-    console.log('Server running on localhost:5000')
+
+const port: number = Number(process.env.PORT) || 8080
+
+app.listen(port, () => {
+    console.log(`Server running on cloud:${port}`)
 })
