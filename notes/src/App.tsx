@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
@@ -10,39 +10,7 @@ class Note {
 }
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: 1,
-      title: 'test note 1',
-      content: 'bal sjfdkfdj dfjd ffe'
-    },
-    {
-      id: 2,
-      title: 'test note 2',
-      content: 'bal sjfdkfdj dfjd ffe'
-    },
-    {
-      id: 3,
-      title: 'test note 3',
-      content: 'bal sjfdkfdj dfjd ffe'
-    },
-    {
-      id: 4,
-      title: 'test note 4',
-      content: 'bal sjfdkfdj dfjd ffe'
-    },
-    {
-      id: 5,
-      title: 'test note 5',
-      content: 'bal sjfdkfdj dfjd ffe'
-    },
-    {
-      id: 6,
-      title: 'test note 6',
-      content: 'bal sjfdkfdj dfjd ffe'
-    },
-  ])
-
+  const [notes, setNotes] = useState<Note[]>([]);
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
 
@@ -95,6 +63,25 @@ function App() {
     const updatedNotes = notes.filter((note) => note.id !== noteId);
     setNotes(updatedNotes)
   };
+
+  const fetchNotes = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/notes");
+      const jsonResponse = await response.json()
+      const notes: Note[] = jsonResponse.result 
+      console.log(JSON.stringify(notes))
+      if (Array.isArray(notes)) {
+        setNotes(notes)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  //empty dependency array ensures that this code only runs once the component is first mounted
+  useEffect(() => {
+    fetchNotes();
+  }, );
 
   return (
     <div className="app-container">
