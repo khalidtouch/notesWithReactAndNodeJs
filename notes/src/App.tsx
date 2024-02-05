@@ -20,9 +20,33 @@ function App() {
     content: content,
   }
 
-  const handleAddNote = (event: React.FormEvent) => {
+  const handleAddNote = async (event: React.FormEvent) => {
     event.preventDefault();
-    setNotes([newNote, ...notes])
+  
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/notes",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title,
+            content,
+          })
+        }
+      ); 
+
+      const newNote = await response.json()
+      setNotes([newNote, ...notes])
+      setTitle('')
+      setContent('')
+
+    } catch (err) {
+      console.log(err)
+    }
+
   }
 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
@@ -68,7 +92,7 @@ function App() {
     try {
       const response = await fetch("http://localhost:5000/api/notes");
       const jsonResponse = await response.json()
-      const notes: Note[] = jsonResponse.result 
+      const notes: Note[] = jsonResponse.result
       console.log(JSON.stringify(notes))
       if (Array.isArray(notes)) {
         setNotes(notes)
@@ -81,7 +105,7 @@ function App() {
   //empty dependency array ensures that this code only runs once the component is first mounted
   useEffect(() => {
     fetchNotes();
-  }, );
+  },);
 
   return (
     <div className="app-container">
