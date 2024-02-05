@@ -22,7 +22,7 @@ function App() {
 
   const handleAddNote = async (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     try {
       const response = await fetch(
         "http://localhost:5000/api/notes",
@@ -36,7 +36,7 @@ function App() {
             content,
           })
         }
-      ); 
+      );
 
       const newNote = await response.json()
       setNotes([newNote, ...notes])
@@ -51,16 +51,26 @@ function App() {
 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
 
-  const handleUpdateNote = (event: React.FormEvent) => {
+  const handleUpdateNote = async (event: React.FormEvent) => {
     event.preventDefault()
 
     if (!selectedNote) return
 
-    const updatedNote: Note = {
-      id: selectedNote.id,
-      title: title,
-      content: content
-    }
+    const response = await fetch(
+      `http://localhost:5000/api/notes/${selectedNote.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title,
+          content
+        })
+      }
+    ); 
+
+    const updatedNote = await response.json()
 
     const updatedNotesList = notes.map((note) => (note.id === selectedNote.id ? updatedNote : note))
     setNotes(updatedNotesList)
